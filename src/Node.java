@@ -28,8 +28,18 @@ public class Node {
         f = g - h;
     }
 
+    public char[][] deepClone(char[][] input) {
+        if (input == null)
+            return null;
+        char[][] result = new char[input.length][];
+        for (int i = 0; i < input.length; i++) {
+            result[i] = input[i].clone();
+        }
+        return result;
+    }
+
     private char[][] swapPieces(char[][] old_board, int row1, int col1, int row2, int col2) {
-        char[][] new_board = old_board.clone();
+        char[][] new_board = deepClone(old_board);
         char temp = new_board[row2][col2];
         new_board[row2][col2] = new_board[row1][col1];
         new_board[row1][col1] = temp;
@@ -38,7 +48,7 @@ public class Node {
 
     public void generateChildren() {
         char[][] work = state.getBoard().clone();
-        int[] active = state.getActive();
+        int[] active = state.getActive().clone();
 
         ArrayList<Node> c = new ArrayList<>();
 
@@ -52,21 +62,30 @@ public class Node {
         if (firstMove) {
             for (int i = 0; i < 5; i++) {
                 for (int j = 0; j < 6; j++) {
+                   // System.out.println("                " + Arrays.deepToString(state.getBoard()));
                     // Move down, if not in last row.
                     if (i < 4) {
-                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j}), types));
+                        Board newN = new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j});
+                        newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 2, false);
+                        c.add(new Node(this, g + 1, newN, types.clone()));
                     }
                     // Move up, if not in first row.
                     if (i > 0) {
-                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j}), types));
+                        Board newN = new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j});
+                        newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 0, false);
+                        c.add(new Node(this, g + 1, newN, types.clone()));
                     }
                     // Move left, if not in first column.
                     if (j > 0) {
-                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j-1), new int[]{i, j-1}), types));
+                        Board newN = new Board(swapPieces(work, i, j, i, j-1), new int[]{i,j-1});
+                        newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 3, false);
+                        c.add(new Node(this, g + 1, newN, types.clone()));
                     }
                     // Move right, if not in last column.
                     if (j < 5) {
-                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j+1), new int[]{i, j+1}), types));
+                        Board newN = new Board(swapPieces(work, i, j, i, j+1), new int[]{i,j+1});
+                        newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 1, false);
+                        c.add(new Node(this, g + 1, newN, types));
                     }
                 }
             }
@@ -78,27 +97,33 @@ public class Node {
             int j = state.getActive()[1];
             // Move down, if not in last row.
             if (i < 4) {
-                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j}), types));
+                Board newN = new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j});
+                newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 2, false);
+                c.add(new Node(this, g + 1, newN, types.clone()));
             }
             // Move up, if not in first row.
             if (i > 0) {
-                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j}), types));
+                Board newN = new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j});
+                newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 0, false);
+                c.add(new Node(this, g + 1, newN, types.clone()));
             }
             // Move left, if not in first column.
             if (j > 0) {
-                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j-1), new int[]{i, j-1}), types));
+                Board newN = new Board(swapPieces(work, i, j, i, j-1), new int[]{i,j-1});
+                newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 3, false);
+                c.add(new Node(this, g + 1, newN, types.clone()));
             }
             // Move right, if not in last column.
             if (j < 5) {
-                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j+1), new int[]{i, j+1}), types));
+                Board newN = new Board(swapPieces(work, i, j, i, j+1), new int[]{i,j+1});
+                newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 1, false);
+                c.add(new Node(this, g + 1, newN, types));
             }
         }
 
 //        System.out.println(Arrays.deepToString(swapPieces(work, new int[]{0,0},new int[]{0,1})));
 
         children = c;
-
-
     }
 
     private ArrayList<Match> findMatches(char[][] board) {
@@ -211,7 +236,6 @@ public class Node {
 
             }
         }
-
         return match_list;
     }
 

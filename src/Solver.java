@@ -5,13 +5,13 @@ public class Solver {
     public static void main(String[] args) {
         char[][] board = new char[][] {
                 {'r','y','r','r','y','r'},
-                {'b','b','b','b','y','r'},
-                {'r','r','b','g','b','r'},
-                {'p','p','y','r','y','p'},
-                {'r','r','b','y','y','y'}
+                {'y','b','p','b','y','g'},
+                {'r','g','b','g','b','r'},
+                {'b','p','y','r','y','p'},
+                {'r','r','b','y','r','r'}
         };
 
-        Node example = new Node(null, 0, new Board(board, new int[]{-1,-1}), new char[]{'b'});
+        Node example = new Node(null, 0, new Board(board, new int[]{-1,-1}), new char[]{'r'});
         /*
         example.generateChildren();
         System.out.println(example.getH());
@@ -21,7 +21,7 @@ public class Solver {
         child.generateChildren();
         System.out.println(child.getChildren().size());
         */
-        Path.findBest(example, 5);
+        Path.findBest(example, 11);
     }
 }
 
