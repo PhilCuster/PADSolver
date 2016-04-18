@@ -6,10 +6,9 @@ public class Node {
     private Node parent;
     private ArrayList<Node> children;
     private int g;
-    private int h;
-    private int f;
+    private double h;
     private int depth;
-    char[] types;
+    private char[] types;
 
     private char[][] board;
 
@@ -19,20 +18,24 @@ public class Node {
         parent = _parent;
         g = _g;
         h = 0;
-        f = g + h;
         depth = _depth;
         board = new char[5][6];
     }
 
-    public Node(Node _parent, int _g, int _depth, char[][] _board, char[] t) {
+    public Node(Node _parent, int _depth, char[][] _board, char[] t) {
         board = _board;
-        children = new ArrayList<>();
+        children = generateChildren();
         parent = _parent;
-        g = _g;
+        g = parent.getG() + 1;
         types = t;
         h = generateScore(types);
-        f = g + h;
         depth = _depth;
+    }
+
+    private ArrayList<Node> generateChildren() {
+        char[][] work = board.clone();
+
+
     }
 
     private ArrayList<Match> findMatches(char[][] board) {
@@ -149,7 +152,7 @@ public class Node {
         return match_list;
     }
 
-    private int generateScore(char[] types) {
+    private double generateScore(char[] types) {
         char[][] work_board = board.clone();
 
         ArrayList<Match> all_matches = new ArrayList<>();
@@ -185,22 +188,27 @@ public class Node {
             all_matches.addAll(matches);
         }
         */
-        int score = 0;
+        double score = 0;
         int combo = 0;
         for (Match m : all_matches) {
+            int damage = 1;
             combo++;
             char type = m.element;
             for (int i = 0; i < types.length; i++) {
                 if (type == types[i]) {
-                    score += (m.count);
+                    score += damage * (1.0 + (m.count-3) * .25);
                 }
             }
         }
-        return score * combo;
+        System.out.println("Base damage: " + score);
+        double multi = 1 + (combo-1) * .25;
+        System.out.println("Total combo: " + multi);
+
+        return score * multi;
 
     }
 
-    public int getH() {
+    public double getH() {
         return h;
     }
 
@@ -220,9 +228,6 @@ public class Node {
         children.add(newChild);
     }
 
-    public int getF() {
-        return f;
-    }
 
     public int getDepth() {
         return depth;
@@ -232,4 +237,7 @@ public class Node {
         this.depth = depth;
     }
 
+    public int getG() {
+        return g;
+    }
 }

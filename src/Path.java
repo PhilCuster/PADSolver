@@ -2,7 +2,7 @@ import java.util.ArrayList;
 import java.util.TreeSet;
 
 public class Path {
-    public static void findBest(Node start) {
+    public static void findBest(Node start, int max) {
         // Nodes already evaluated.
         ArrayList<Node> closed = new ArrayList<>();
 
@@ -11,8 +11,8 @@ public class Path {
         // Add the start Node.
         open.add(start);
 
-        // The node that is the best path to our current node.
-        Node best_source = null;
+        // The node that is our Node with the highest score.
+        Node best = start;
 
         // Loop while there are nodes to evaluate.
         while (open.size() > 0) {
@@ -23,7 +23,15 @@ public class Path {
             // Add the current Node to the closed list.
             closed.add(current);
 
-            // If we found a goal then stop.
+            // If we found a node that is better than the our current best then record that.
+            if (current.getH() > best.getH()) {
+                best = current;
+            }
+
+            // If we have not reached our max amount of moves.
+            if (current.getG() < max) {
+
+            }
 
 
         }

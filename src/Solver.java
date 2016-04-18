@@ -5,10 +5,10 @@ public class Solver {
     public static void main(String[] args) {
         char[][] board = new char[][] {
                 {'r','y','r','r','y','r'},
-                {'p','b','b','b','y','p'},
-                {'r','r','b','g','b','g'},
+                {'b','b','b','b','y','r'},
+                {'r','r','b','g','b','r'},
                 {'p','p','y','r','y','p'},
-                {'r','r','b','y','b','g'}
+                {'r','r','b','y','y','y'}
         };
 
         Node example = new Node(null, 0, 0, board, new char[]{'b'});
