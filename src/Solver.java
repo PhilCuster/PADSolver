@@ -11,7 +11,18 @@ public class Solver {
                 {'r','r','b','y','y','y'}
         };
 
-        Node example = new Node(null, 0, 0, board, new char[]{'b'});
+        Node example = new Node(null, 0, new Board(board, new int[]{-1,-1}), new char[]{'b'});
+        /*
+        example.generateChildren();
         System.out.println(example.getH());
+        System.out.println(example.getF());
+        System.out.println(example.getChildren().size());
+        Node child = example.getChildren().get(0);
+        child.generateChildren();
+        System.out.println(child.getChildren().size());
+        */
+        Path.findBest(example, 5);
     }
 }
+
+

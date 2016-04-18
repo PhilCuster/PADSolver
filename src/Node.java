@@ -7,33 +7,96 @@ public class Node {
     private ArrayList<Node> children;
     private int g;
     private double h;
+    private double f;
     private int depth;
     private char[] types;
 
-    private char[][] board;
+    private Board state;
 
-
-    public Node(Node _parent, int _g, int _depth) {
-        children = new ArrayList<>();
-        parent = _parent;
-        g = _g;
-        h = 0;
-        depth = _depth;
-        board = new char[5][6];
-    }
-
-    public Node(Node _parent, int _depth, char[][] _board, char[] t) {
-        board = _board;
-        children = generateChildren();
-        parent = _parent;
-        g = parent.getG() + 1;
+    public Node(Node _parent, int _depth, Board s, char[] t) {
+        state = s;
         types = t;
-        h = generateScore(types);
+        parent = _parent;
         depth = _depth;
+        children = null;
+        if (parent == null) {
+            g = 1;
+        } else {
+            g = parent.getG() + 1;
+        }
+        h = generateScore(types);
+        f = g - h;
     }
 
-    private ArrayList<Node> generateChildren() {
-        char[][] work = board.clone();
+    private char[][] swapPieces(char[][] old_board, int row1, int col1, int row2, int col2) {
+        char[][] new_board = old_board.clone();
+        char temp = new_board[row2][col2];
+        new_board[row2][col2] = new_board[row1][col1];
+        new_board[row1][col1] = temp;
+        return new_board;
+    }
+
+    public void generateChildren() {
+        char[][] work = state.getBoard().clone();
+        int[] active = state.getActive();
+
+        ArrayList<Node> c = new ArrayList<>();
+
+        boolean firstMove = false;
+
+        if (active[0] == -1) {
+            firstMove = true;
+        }
+
+        // We need to check the moves for every single piece.
+        if (firstMove) {
+            for (int i = 0; i < 5; i++) {
+                for (int j = 0; j < 6; j++) {
+                    // Move down, if not in last row.
+                    if (i < 4) {
+                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j}), types));
+                    }
+                    // Move up, if not in first row.
+                    if (i > 0) {
+                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j}), types));
+                    }
+                    // Move left, if not in first column.
+                    if (j > 0) {
+                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j-1), new int[]{i, j-1}), types));
+                    }
+                    // Move right, if not in last column.
+                    if (j < 5) {
+                        c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j+1), new int[]{i, j+1}), types));
+                    }
+                }
+            }
+        }
+
+        // If not the first move then we need to check the moves only for the active piece.
+        else {
+            int i = state.getActive()[0];
+            int j = state.getActive()[1];
+            // Move down, if not in last row.
+            if (i < 4) {
+                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j}), types));
+            }
+            // Move up, if not in first row.
+            if (i > 0) {
+                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j}), types));
+            }
+            // Move left, if not in first column.
+            if (j > 0) {
+                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j-1), new int[]{i, j-1}), types));
+            }
+            // Move right, if not in last column.
+            if (j < 5) {
+                c.add(new Node(this, g + 1, new Board(swapPieces(work, i, j, i, j+1), new int[]{i, j+1}), types));
+            }
+        }
+
+//        System.out.println(Arrays.deepToString(swapPieces(work, new int[]{0,0},new int[]{0,1})));
+
+        children = c;
 
 
     }
@@ -142,7 +205,7 @@ public class Node {
                     }
                 }
 
-                System.out.println(current + " - " + count);
+//                System.out.println(current + " - " + count);
 
                 match_list.add(new Match(current, count, isRow, matches));
 
@@ -153,7 +216,7 @@ public class Node {
     }
 
     private double generateScore(char[] types) {
-        char[][] work_board = board.clone();
+        char[][] work_board = state.getBoard().clone();
 
         ArrayList<Match> all_matches = new ArrayList<>();
 
@@ -200,9 +263,9 @@ public class Node {
                 }
             }
         }
-        System.out.println("Base damage: " + score);
+//        System.out.println("Base damage: " + score);
         double multi = 1 + (combo-1) * .25;
-        System.out.println("Total combo: " + multi);
+//        System.out.println("Total combo: " + multi);
 
         return score * multi;
 
@@ -239,5 +302,13 @@ public class Node {
 
     public int getG() {
         return g;
+    }
+
+    public double getF() {
+        return f;
+    }
+
+    public Board getState() {
+        return state;
     }
 }
