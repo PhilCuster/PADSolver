@@ -77,7 +77,8 @@ public class Path {
                 System.out.print(board[i][5] + " ");
                 System.out.println();
             }
-            System.out.println("Score: " + n.getH());
+            System.out.println("Damage: " + n.getH());
+            System.out.println("Combo: " + n.total_combo);
             System.out.println();
         }
         System.out.println("Number of nodes generated: " + node_count);

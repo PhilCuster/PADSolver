@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Stack;
+import java.util.*;
 
 public class Node {
     private Node parent;
@@ -9,11 +7,12 @@ public class Node {
     private double h;
     private double f;
     private int depth;
-    private char[] types;
+    private Map<Character, Integer> types;
+    public int total_combo;
 
     private Board state;
 
-    public Node(Node _parent, int _depth, Board s, char[] t) {
+    public Node(Node _parent, int _depth, Board s, Map<Character,Integer> t) {
         state = s;
         types = t;
         parent = _parent;
@@ -26,6 +25,7 @@ public class Node {
         }
         h = generateScore(types);
         f = g - h;
+
     }
 
     public char[][] deepClone(char[][] input) {
@@ -67,19 +67,19 @@ public class Node {
                     if (i < 4) {
                         Board newN = new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j});
                         newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 2, false);
-                        c.add(new Node(this, g + 1, newN, types.clone()));
+                        c.add(new Node(this, g + 1, newN, types));
                     }
                     // Move up, if not in first row.
                     if (i > 0) {
                         Board newN = new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j});
                         newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 0, false);
-                        c.add(new Node(this, g + 1, newN, types.clone()));
+                        c.add(new Node(this, g + 1, newN, types));
                     }
                     // Move left, if not in first column.
                     if (j > 0) {
                         Board newN = new Board(swapPieces(work, i, j, i, j-1), new int[]{i,j-1});
                         newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 3, false);
-                        c.add(new Node(this, g + 1, newN, types.clone()));
+                        c.add(new Node(this, g + 1, newN, types));
                     }
                     // Move right, if not in last column.
                     if (j < 5) {
@@ -99,19 +99,19 @@ public class Node {
             if (i < 4) {
                 Board newN = new Board(swapPieces(work, i, j, i+1, j), new int[]{i+1,j});
                 newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 2, false);
-                c.add(new Node(this, g + 1, newN, types.clone()));
+                c.add(new Node(this, g + 1, newN, types));
             }
             // Move up, if not in first row.
             if (i > 0) {
                 Board newN = new Board(swapPieces(work, i, j, i-1, j), new int[]{i-1,j});
                 newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 0, false);
-                c.add(new Node(this, g + 1, newN, types.clone()));
+                c.add(new Node(this, g + 1, newN, types));
             }
             // Move left, if not in first column.
             if (j > 0) {
                 Board newN = new Board(swapPieces(work, i, j, i, j-1), new int[]{i,j-1});
                 newN.setShowMoves(deepClone(state.getShowMoves()), i, j, 3, false);
-                c.add(new Node(this, g + 1, newN, types.clone()));
+                c.add(new Node(this, g + 1, newN, types));
             }
             // Move right, if not in last column.
             if (j < 5) {
@@ -121,15 +121,10 @@ public class Node {
             }
         }
 
-//        System.out.println(Arrays.deepToString(swapPieces(work, new int[]{0,0},new int[]{0,1})));
-
         children = c;
     }
 
     private ArrayList<Match> findMatches(char[][] board) {
-        int combo = 0;
-        int damage = 0;
-
         // Create an empty board where can copy over matches we find
         char[][] matches = {{'X','X','X','X','X','X'},
                 {'X','X','X','X','X','X'},
@@ -176,8 +171,6 @@ public class Node {
             }
         }
         char[][] work = matches.clone();
-//        System.out.println(Arrays.deepToString(matches));
-        // Check our matches.
 
         ArrayList<Match> match_list = new ArrayList<>();
 
@@ -222,6 +215,7 @@ public class Node {
                     }
                 }
 
+                // Score currently does not take into account rows because I am choosing to ignore awoken skills.
                 boolean isRow = false;
                 for (int k = 0; k < 4; k++) {
                     if(current_match[k][0] == 'O' && current_match[k][1] == 'O' && current_match[k][2] == 'O' &&
@@ -230,8 +224,6 @@ public class Node {
                     }
                 }
 
-//                System.out.println(current + " - " + count);
-
                 match_list.add(new Match(current, count, isRow, matches));
 
             }
@@ -239,57 +231,27 @@ public class Node {
         return match_list;
     }
 
-    private double generateScore(char[] types) {
+    private double generateScore(Map<Character, Integer> types) {
         char[][] work_board = state.getBoard().clone();
 
         ArrayList<Match> all_matches = new ArrayList<>();
 
         all_matches.addAll(findMatches(work_board));
 
-        /*
-        while(true) {
-            ArrayList<Match> matches = findMatches(work_board);
-            if (matches.size() == 0) {
-                break;
-            }
-            System.out.println(Arrays.deepToString(matches.get(0).matches));
-            for (int i = 0; i < 5; i++) {
-                for (int j = 0; j < 6; j++) {
-                    if (matches.get(0).matches[i][j] != 'X') {
-                        work_board[i][j] = 'X';
-                    }
-                }
-            }
-            for (int j = 0; j < 6; j++) {
-                int target = 4;
-                for (int i = 4; i >= 0; i--) {
-                    if (work_board[i][j] != 'X') {
-                        work_board[target][j] = work_board[i][j];
-                        target--;
-                    }
-                }
-                for (; target >= 0; target--) {
-                    work_board[target][j] = 'X';
-                }
-            }
-            all_matches.addAll(matches);
-        }
-        */
         double score = 0;
         int combo = 0;
         for (Match m : all_matches) {
-            int damage = 1;
             combo++;
+            int damage = 0;
             char type = m.element;
-            for (int i = 0; i < types.length; i++) {
-                if (type == types[i]) {
-                    score += damage * (1.0 + (m.count-3) * .25);
-                }
+            if (type != 'h') {
+                damage = types.get(type);
             }
+            score += damage * (1.0 + (m.count-3) * .25);
+
         }
-//        System.out.println("Base damage: " + score);
+        total_combo = combo;
         double multi = 1 + (combo-1) * .25;
-//        System.out.println("Total combo: " + multi);
 
         return score * multi;
 
