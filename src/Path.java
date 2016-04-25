@@ -77,10 +77,11 @@ public class Path {
                 System.out.print(board[i][5] + " ");
                 System.out.println();
             }
-            System.out.println(n.getH());
+            System.out.println("Score: " + n.getH());
             System.out.println();
         }
         System.out.println("Number of nodes generated: " + node_count);
         System.out.println("Number of moves: " + (best_path.size()-1));
     }
+
 }
