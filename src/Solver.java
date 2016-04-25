@@ -31,18 +31,9 @@ public class Solver {
             e.printStackTrace();
         }
 
-        char[][] board = new char[][] {
-                {'r','y','r','r','y','r'},
-                {'y','b','p','b','y','g'},
-                {'r','g','b','g','b','r'},
-                {'b','p','y','r','y','p'},
-                {'r','r','b','y','r','r'}
-        };
-
         System.out.println();
 
-        Node example = new Node(null, 0, new Board(input, new int[]{-1,-1}), new char[]{'r'});
-        Path.findBest(example, maxMoves);
+        Path.findBest(new Node(null, 0, new Board(input, new int[]{-1,-1}), new char[]{'r'}), maxMoves);
     }
 }
 
