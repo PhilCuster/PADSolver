@@ -28,6 +28,9 @@ public class Node {
 
     }
 
+    /*
+    Fully clones a 2D array, including members.
+     */
     public char[][] deepClone(char[][] input) {
         if (input == null)
             return null;
@@ -38,6 +41,9 @@ public class Node {
         return result;
     }
 
+    /*
+    Given a board and two positions, returns a board where the positions are swapped.
+     */
     private char[][] swapPieces(char[][] old_board, int row1, int col1, int row2, int col2) {
         char[][] new_board = deepClone(old_board);
         char temp = new_board[row2][col2];
@@ -46,6 +52,10 @@ public class Node {
         return new_board;
     }
 
+    /*
+    Generates the children of the current node.
+    Checks all possible moves.
+     */
     public void generateChildren() {
         char[][] work = state.getBoard().clone();
         int[] active = state.getActive().clone();
@@ -124,6 +134,12 @@ public class Node {
         children = c;
     }
 
+    /*
+    Given the board, find matches on it.
+    Thanks to Alex Knutson, who implemented a PAD solver for javascript.
+    This part was inspired by part of his script.
+    https://github.com/alexknutson/Combo.Tips
+     */
     private ArrayList<Match> findMatches(char[][] board) {
         // Create an empty board where can copy over matches we find
         char[][] matches = {{'X','X','X','X','X','X'},
@@ -231,6 +247,9 @@ public class Node {
         return match_list;
     }
 
+    /*
+    Generate the score (heuristic) for the board.
+     */
     private double generateScore(Map<Character, Integer> types) {
         char[][] work_board = state.getBoard().clone();
 
@@ -265,25 +284,8 @@ public class Node {
         return parent;
     }
 
-    public void setParent(Node parent) {
-        this.parent = parent;
-    }
-
     public ArrayList<Node> getChildren() {
         return children;
-    }
-
-    public void addChild(Node newChild) {
-        children.add(newChild);
-    }
-
-
-    public int getDepth() {
-        return depth;
-    }
-
-    public void setDepth(int depth) {
-        this.depth = depth;
     }
 
     public int getG() {

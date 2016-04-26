@@ -19,10 +19,8 @@ public class Solver {
         try (BufferedReader br = new BufferedReader(new FileReader(new File(file)))) {
             String line;
             while ((line = br.readLine()) != null) {
-                String[] line_list = line.split(",");
-
-                for(int j = 0; j < line_list.length; j++) {
-                    input[i][j] = line_list[j].charAt(0);
+                for(int j = 0; j < 6; j++) {
+                    input[i][j] = line.charAt(j);
                 }
                 i++;
             }
